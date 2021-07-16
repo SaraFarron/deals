@@ -1,0 +1,5 @@
+.idea/
+.dealsenv/
+
+# Project exclude paths
+/dealsenv/
