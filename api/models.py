@@ -36,3 +36,15 @@ class Deal(models.Model):
     total = models.IntegerField()
     quantity = models.IntegerField()
     date = models.DateTimeField(auto_now=False, auto_now_add=False)
+
+    def __str__(self):
+        return f'{self.customer} bought {self.item}'
+
+
+class Client(models.Model):
+    username = models.CharField(max_length=128)
+    money_spent = models.IntegerField()
+    # gems = models.Field
+
+    def __str__(self):
+        return self.username
