@@ -35,4 +35,4 @@ class Deal(models.Model):
     item = models.CharField(choices=gems, max_length=128)
     total = models.IntegerField()
     quantity = models.IntegerField()
-    date = models.DateTimeField()
+    date = models.DateTimeField(auto_now=False, auto_now_add=False)
