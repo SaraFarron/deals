@@ -7,4 +7,4 @@ class ClientSerializer(ModelSerializer):
 
     class Meta:
         model = Client
-        fields = '__all__'
+        fields = ['username', 'money_spent', 'gems']

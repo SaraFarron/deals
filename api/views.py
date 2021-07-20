@@ -13,8 +13,23 @@ class Home(APIView):
         for obj in [deal for deal in Deal.objects.all()]:
             if obj.item not in obj.customer.gems.all():
                 obj.customer.gems.add(obj.item)
+            obj.customer.money_spent += obj.total
+            obj.customer.save()
 
         queryset = Client.objects.order_by('-money_spent')[:5]
+        gems_list = []
+        for client in queryset:
+            gems_list += [gem for gem in client.gems.all()]
+
+        for client in queryset:
+            i = 0
+            while i < len(client.gems.all()):
+                gem = client.gems.all()[i]
+                if gems_list.count(gem) < 2:
+                    client.gems.remove(gem)
+                    client.save()
+                i += 1
+
         serializer = ClientSerializer(data=queryset, many=True)
         if serializer.is_valid():
             serializer.save()
@@ -23,25 +38,22 @@ class Home(APIView):
     def post(self, request, format=None):
         content_type = request.content_type.split(';')[0].strip()
 
-        if content_type == 'text/csv':
-            data = request.data
-            csv_table = self.parse(data)
-            self.create_objects(csv_table)
-            return Response(status=200)
-
-        elif content_type == 'multipart/form-data':
+        if content_type == 'multipart/form-data':
             try:
                 fh = request.data.get('deals', None)
                 csv_table = self.parse(fh)
             except AttributeError:
                 return Response(
-                    {'Status: Error, Desc:': 'Ошибка в имени аргумента, поменяйте на deals'},
+                    {'Ошибка:': 'Не найден csv файл'},
                     status=400
                 )
             self.create_objects(csv_table)
             return Response(status=200)
         else:
-            return Response({'Status: Error, Desc:': 'Неподдерживаемый формат файла'}, status=415)
+            return Response(
+                {'Ошибка:': 'Неподдерживаемый формат данных, ожидался content-type: multipart/form-data'},
+                status=400
+            )
 
         return Response(serializer.errors, status=400)
 
@@ -73,7 +85,6 @@ class Home(APIView):
             if obj['customer'] not in [client.username for client in all_clients]:
                 client = Client.objects.create(
                     username=obj['customer'],
-                    money_spent=obj['total']
                 )
                 client.save()
 

@@ -11,7 +11,7 @@ class Gem(models.Model):
 
 class Client(models.Model):
     username = models.CharField(max_length=128)
-    money_spent = models.IntegerField()
+    money_spent = models.IntegerField(default=0)
     gems = models.ManyToManyField(Gem)
 
     def __str__(self):
