@@ -23,10 +23,10 @@ class Home(APIView):
 
         for client in queryset:
             i = 0
-            while i < len(client.gems.all()):
-                gem = client.gems.all()[i]
-                if gems_list.count(gem) < 2:
-                    client.gems.remove(gem)
+            gems = client.gems.all()
+            while i < len(gems):
+                if gems_list.count(gems[i]) == 1:
+                    client.gems.remove(gems[i])
                     client.save()
                 i += 1
 
@@ -47,6 +47,7 @@ class Home(APIView):
                     {'Ошибка:': 'Не найден csv файл'},
                     status=400
                 )
+            self.clean_data()
             self.create_objects(csv_table)
             return Response(status=200)
         else:
@@ -55,9 +56,7 @@ class Home(APIView):
                 status=400
             )
 
-        return Response(serializer.errors, status=400)
-
-    def parse(self, stream, media_type=None, parser_context=None):
+    def parse(self, stream):
         charset = 'utf-8'
         txt = list(csv.reader(stream.read().decode(charset).splitlines()))
         csv_table = []
@@ -96,3 +95,8 @@ class Home(APIView):
                 date=obj['date'],
             )
             deal.save()
+
+    def clean_data(self):
+        Deal.objects.all().delete()
+        Client.objects.all().delete()
+        Gem.objects.all().delete()
