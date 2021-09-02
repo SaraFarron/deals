@@ -11,13 +11,13 @@ services:
       - web
     restart: "on-failure"
   web:
-    build: . #build the image for the web service from the dockerfile in parent directory
+    build: .
     command: sh -c "python manage.py makemigrations &&
                     python manage.py migrate &&
                     python manage.py collectstatic --no-input &&
                     gunicorn deals.wsgi:application --bind 0.0.0.0:8000"
     volumes:
-      - .:/microservice:rw # map data and files from parent directory in host to microservice directory in docker containe
+      - .:/microservice:rw
       - static_volume:/home/deals/static
 
     image: deals

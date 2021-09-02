@@ -1,8 +1,10 @@
-from rest_framework.serializers import ModelSerializer
-from .models import Deal
+from rest_framework.serializers import ModelSerializer, StringRelatedField
+from .models import Client
 
 
-class DealSerializer(ModelSerializer):
+class ClientSerializer(ModelSerializer):
+    gems = StringRelatedField(many=True)
+
     class Meta:
-        model = Deal
-        fields = '__all__'
+        model = Client
+        fields = ['username', 'money_spent', 'gems']
